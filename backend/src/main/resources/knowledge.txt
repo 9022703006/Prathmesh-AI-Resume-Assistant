@@ -1,0 +1,197 @@
+
+PERSONAL PROFILE
+
+Name: Prathmesh Sanjay Patil
+Professional Title: Java Full Stack Developer with AI
+Specialization: Java, Spring Boot, REST APIs, Microservices, AI Integration and Workflow Automation.
+
+Prathmesh is an entry-level Java Full Stack Developer with practical experience building full-stack applications, REST APIs, AI-powered applications and workflow automation solutions.
+
+Portfolio: https://personal-portfolio-eltm.onrender.com
+GitHub Profile: https://github.com/9022703006
+LinkedIn: https://linkedin.com/in/prathmesh-patil-64b1b72a1
+
+
+PROFESSIONAL SUMMARY
+
+Prathmesh has hands-on experience with Java, Spring Boot, Spring Security, Microservices, Spring Data JPA, Hibernate, MySQL and MongoDB.
+
+He has frontend development experience with Angular and React.
+
+His AI and automation experience includes Gemini API, OpenAI API, Spring AI, Ollama, n8n, AI Agents and Vapi.ai.
+
+He has developed secure REST APIs, JWT-based authentication, role-based access control, chatbot integrations and automated workflows.
+
+
+WORK EXPERIENCE
+
+Position: Java Full Stack Developer (AI Integration) Intern
+Organization: Skill IT Academy, Pune
+Duration: March 2025 – December 2025
+
+Responsibilities and experience:
+
+- Developed RESTful APIs using Java and Spring Boot.
+- Worked with Spring Security, Spring Data JPA, Hibernate and Microservices.
+- Implemented JWT-based authentication.
+- Integrated AI capabilities using Spring AI, OpenAI and Ollama.
+- Created automated workflows using n8n.
+- Worked with voice AI solutions using Vapi.
+- Developed frontend modules using Angular.
+- Worked on database operations and application performance.
+
+
+TECHNICAL SKILLS
+
+Programming and Backend:
+Java, Spring Boot, Spring Security, Microservices, REST APIs, Spring Data JPA, Hibernate.
+
+Frontend:
+Angular, React.js, JavaScript, TypeScript, HTML, CSS, Angular Material.
+
+Databases:
+MySQL, MongoDB, PostgreSQL.
+
+AI and Automation:
+Gemini API, OpenAI API, Spring AI, Ollama, AI Agents, n8n, Workflow Automation, Vapi.ai.
+
+Development Tools:
+Git, GitHub, Postman, Thunder Client, IntelliJ IDEA, VS Code.
+
+
+PROJECT 1: COMMODITY ADMIN AI
+
+Project Name: Commodity_Admin_AI
+Category: AI-Powered B2B Commodity Marketplace Administration Assistant.
+
+Technologies:
+Java, Spring Boot, Spring AI, Gemini API, PostgreSQL, PGVector, REST APIs, Angular, n8n.
+
+Description:
+
+An AI-powered administrative chatbot designed for a B2B commodity raw material marketplace.
+
+The chatbot helps administrators retrieve marketplace information through natural-language questions.
+
+Architecture:
+Angular Chat Interface → Spring Boot REST API → Intent Detection → Business Services → TradeX APIs / PGVector → Gemini AI.
+
+Key Features:
+
+- Admin-focused AI chatbot.
+- Natural-language questions about marketplace information.
+- Integration with TradeX backend through REST APIs.
+- Commodity information and inventory queries.
+- Supply, bid and negotiation information.
+- Deal and contract information.
+- AI-powered responses using Gemini.
+- Retrieval-Augmented Generation (RAG) using PGVector for knowledge retrieval.
+- Multilingual interaction support for English, Hindi and Marathi.
+
+Important:
+The chatbot retrieves marketplace business information through TradeX APIs. It does not directly allow the AI model to query the TradeX database.
+
+Shop Rate and Global Rate are separate data sources and must never be combined or averaged.
+
+
+PROJECT 2: LOAN MANAGEMENT SYSTEM WITH AI INTEGRATION
+
+Architecture: Microservices.
+
+Technologies:
+Java, Spring Boot, Spring Security, Spring Data JPA, Hibernate, REST APIs, MySQL, Angular, JWT, OpenAI API, n8n.
+
+Description:
+
+A role-based loan management platform designed to manage customer registration, loan processing and approvals.
+
+Key Features:
+
+- Developed 20+ RESTful APIs using Spring Boot.
+- Implemented JWT authentication and role-based access control.
+- Automated approximately 40% of manual data entry for customer registration and approvals.
+- Integrated an AI chatbot using OpenAI API and n8n.
+- Optimized database queries, improving API response time by approximately 30%.
+
+GitHub Repository: Add the actual repository URL when available.
+
+
+PROJECT 3: AI-ENABLED LIVESTOCK AND COW FARM MANAGEMENT PLATFORM
+
+Technologies:
+React.js, Node.js, Express.js, MongoDB, MySQL, n8n, Gemini API, OpenAI API.
+
+Description:
+
+A full-stack livestock and cow farm management platform for tracking livestock, farm activities and daily operations.
+
+Key Features:
+
+- Developed a MERN-stack application.
+- Built REST APIs using Node.js and Express.js.
+- Managed more than 100 livestock records in MongoDB.
+- Integrated an AI chatbot using n8n with Gemini/OpenAI.
+- Digitized farm management workflows.
+- Improved operational efficiency by approximately 50%.
+
+Live Website: Add the actual live website URL when available.
+GitHub Repository: Add the actual repository URL when available.
+
+
+PROJECT 4: E-COMMERCE PLATFORM WITH AI AUTOMATION
+
+Technologies:
+Angular, Java, Spring Boot, Spring Data JPA, MySQL, Angular Material, Postman, n8n, OpenAI API.
+
+Description:
+
+A full-stack e-commerce platform with product listing, user authentication, shopping cart and order management.
+
+Key Features:
+
+- Developed backend APIs using Spring Boot and JPA.
+- Implemented product management and order processing.
+- Managed a catalog of more than 100 products.
+- Created a responsive Angular Material interface.
+- Integrated an AI chatbot using OpenAI and n8n.
+- Implemented AI-based product recommendations and customer assistance.
+
+
+EDUCATION
+
+Bachelor of Technology:
+Computer Science and Engineering (Artificial Intelligence and Data Science).
+
+Diploma:
+Computer Engineering.
+
+School:
+CBSE Class X.
+
+
+ACHIEVEMENTS
+
+- Gold Medalist in Javelin Throw at Kolhapur Athletics Competition.
+- State-Level Under-17 Cricket Player representing the South Maharashtra Team.
+
+
+CERTIFICATIONS
+
+- Full Stack Java Development.
+- MERN Stack Development.
+- Angular Framework.
+- Networking and Electronics Security System.
+- Python Programming.
+
+
+CHATBOT RESPONSE INSTRUCTIONS
+
+- Answer questions using the information in this knowledge file.
+- Answer questions about Prathmesh's skills, experience, education, projects and technologies.
+- Provide portfolio, GitHub and LinkedIn links when requested.
+- Explain project architecture and features when asked.
+- Keep answers clear, professional and recruiter-friendly.
+- Do not invent employment history, project features, achievements, URLs or technical skills.
+- If information is unavailable, clearly say that it is not included in the available profile information.
+- If a recruiter asks a general greeting such as "Hi" or "Hello", respond politely.
+- If asked a question unrelated to Prathmesh's profile, explain that you are Prathmesh's AI Resume Assistant.

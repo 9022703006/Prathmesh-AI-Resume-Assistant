@@ -1,0 +1,327 @@
+We are implementing EMAIL OTP for the existing Spring Boot project:
+
+PROJECT NAME:
+ai-chatbot-backend
+
+PROJECT PATH:
+D:\Java Springboot\AI-Chatbot-Gemini-Angular-Fresh\backend
+
+IMPORTANT:
+This is the ONLY project you are allowed to modify.
+
+DO NOT MODIFY OR WORK ON:
+
+D:\Java Springboot\OwnerandDriver\OwnerandDriver
+
+The OwnerandDriver project is a different project and must be completely ignored for this task.
+
+==================================================
+GENERAL RULES
+=============
+
+* OTP must be sent to the user's email address stored in `Admin_register.email`.
+* Use Gmail SMTP for sending OTP emails.
+* Do not use SMS.
+* Do not change the existing `Admin_register.email` field.
+* Do not change unrelated existing functionality.
+* Do NOT modify Spring Security.
+* Do NOT modify JWT.
+* Do NOT modify login.
+* Do NOT modify refresh token.
+* Do NOT modify logout.
+* Do NOT modify vehicle functionality.
+* Do NOT modify driver functionality.
+* Never hard-code Gmail passwords, Google App Passwords, API keys, or secrets in Java code or committed configuration.
+* Use environment variables for Gmail credentials.
+* OTP must not be exposed unnecessarily in API responses.
+* OTP must not be unnecessarily logged.
+* Do not change Spring Boot version.
+* Do not change Java version.
+* After EACH step, compile/test, report the result, and STOP.
+* Do NOT automatically continue to the next step.
+* Wait for my explicit instruction before continuing.
+
+==================================================
+STEP 1 — INSPECT EXISTING OTP IMPLEMENTATION
+============================================
+
+Inspect ONLY the existing OTP implementation in:
+
+ai-chatbot-backend
+
+Relevant existing classes include:
+
+`Admin_register`
+`Admin_Reg_service`
+`Admin_reg_Repository`
+
+Do not modify anything.
+
+Tell me:
+
+1. Where OTP is generated.
+2. How many digits the OTP contains.
+3. Where OTP is saved in the database.
+4. Where OTP expiry is set.
+5. How long the OTP remains valid.
+6. Where OTP is verified.
+7. How the user/email is identified during verification.
+8. Whether any email is currently being sent.
+9. What is missing to send OTP to `Admin_register.email`.
+10. Whether Gmail SMTP can be integrated without changing existing functionality.
+11. Which files will need to be created or modified.
+12. Whether an Admin registration/OTP controller already exists.
+
+IMPORTANT:
+
+Do not modify any file.
+
+Do not modify Spring Security, JWT, login, refresh token, logout, vehicle, driver, booking, chat, or other unrelated functionality.
+
+STOP after inspection and wait for my explicit instruction.
+
+==================================================
+STEP 2 — GMAIL SMTP CONFIGURATION
+=================================
+
+Implement ONLY the Gmail SMTP dependency and configuration required for Email OTP.
+
+Requirements:
+
+1. Add the required Spring Boot mail dependency if it is not already present.
+
+2. Configure Gmail SMTP.
+
+3. Use environment variables for:
+
+   * Gmail username
+   * Gmail App Password
+
+4. Never hard-code Gmail credentials.
+
+5. Do not create EmailService yet.
+
+6. Do not modify OTP generation.
+
+7. Do not modify OTP verification.
+
+8. Do not modify the Admin registration flow yet.
+
+9. Do not send any email yet.
+
+10. Do not modify Spring Security/JWT/login/refresh/logout.
+
+11. Do not modify vehicle or driver functionality.
+
+12. Do not modify unrelated functionality.
+
+After changes:
+
+1. Compile the project.
+2. Run relevant existing tests.
+3. Report exactly which files were changed.
+4. Report the required environment variables.
+5. Report build/test result.
+
+STOP and wait for my explicit instruction.
+
+==================================================
+STEP 3 — CREATE EMAIL SERVICE
+=============================
+
+Create a dedicated:
+
+`EmailService`
+
+inside the appropriate service package of `ai-chatbot-backend`.
+
+Requirements:
+
+1. Use Spring's `JavaMailSender`.
+
+2. Create a clean service class.
+
+3. The service must accept:
+
+   * recipient email
+   * OTP
+
+4. Send a clear OTP email.
+
+5. Email must state that the OTP expires after 5 minutes.
+
+6. Do NOT generate the OTP inside EmailService.
+
+7. Do NOT save the OTP inside EmailService.
+
+8. Do NOT verify the OTP inside EmailService.
+
+9. Do NOT expose the OTP through an API response.
+
+10. Do not modify Spring Security/JWT/login/refresh/logout.
+
+11. Do not modify vehicle or driver code.
+
+12. Do not modify unrelated functionality.
+
+After changes:
+
+1. Compile the project.
+2. Run relevant tests.
+3. Report exactly which files were created/modified.
+4. Report build/test result.
+
+STOP and wait for my explicit instruction.
+
+==================================================
+STEP 4 — CONNECT EMAIL OTP TO ADMIN REGISTRATION + VERIFICATION
+===============================================================
+
+Modify ONLY the existing Admin OTP flow.
+
+### Registration
+
+Requirements:
+
+1. Use the existing OTP generation.
+2. Do not generate a second OTP.
+3. Use the existing 5-minute expiry.
+4. Save the OTP using the existing mechanism.
+5. After the OTP is generated and saved, send the SAME OTP using EmailService.
+6. Send it to:
+
+`admin.getEmail()`
+
+7. Do not send SMS.
+8. Do not expose the OTP in the registration response.
+9. Do not unnecessarily log the OTP.
+10. If email sending fails, do not pretend that the email was successfully sent.
+11. Handle email failure appropriately and explain the chosen behavior.
+
+### OTP Verification
+
+Review the existing verification implementation.
+
+Requirements:
+
+1. Verify the OTP against the OTP stored in the database.
+2. Verify it for the correct user's email.
+3. Reject incorrect OTP.
+4. Reject expired OTP.
+5. Preserve existing successful verification behavior.
+6. Do not generate another OTP during verification.
+7. Do not send another email during verification.
+
+IMPORTANT:
+
+Do NOT modify:
+
+* Spring Security
+* JWT
+* Login
+* Refresh token
+* Logout
+* Vehicle
+* Driver
+* Booking
+* Chat
+* Other unrelated functionality
+
+Only modify OTP-related code and the minimum required registration/controller code.
+
+After changes:
+
+1. Compile the project.
+2. Run relevant tests.
+3. Report exactly which files were changed.
+4. Explain the final registration → email OTP → verification flow.
+5. Report build/test result.
+
+STOP and wait for my explicit instruction.
+
+==================================================
+STEP 5 — SECURITY REVIEW + TESTS + POSTMAN
+==========================================
+
+Review ONLY the Email OTP implementation.
+
+Do not redesign the application.
+
+### Email OTP security review
+
+Check:
+
+1. OTP is exactly 6 digits.
+2. OTP generation is secure.
+3. If the existing implementation uses `Random`, replace it with `SecureRandom`.
+4. OTP expires after 5 minutes.
+5. OTP belongs to the correct user/email.
+6. Incorrect OTP is rejected.
+7. Expired OTP is rejected.
+8. OTP is not exposed in API responses.
+9. OTP is not unnecessarily logged.
+10. Gmail username is not hard-coded.
+11. Gmail App Password is not hard-coded.
+12. Gmail credentials are not committed to Git.
+
+### Automated tests
+
+Create or update tests for:
+
+1. OTP generation.
+2. OTP expiry.
+3. Correct OTP verification.
+4. Incorrect OTP verification.
+5. Expired OTP rejection.
+6. EmailService invocation during Admin registration.
+7. Correct user email receives the OTP.
+8. OTP is not exposed in the registration response.
+
+For email tests:
+
+* Do NOT use a real Gmail account.
+* Mock `JavaMailSender` or `EmailService`.
+
+Do NOT modify or test unrelated Spring Security/JWT/login/refresh/logout functionality as part of this task.
+
+### Postman testing
+
+Use the existing application base URL:
+
+`http://localhost:7000`
+
+Before giving endpoint instructions, inspect the actual controller mappings in this project.
+
+Provide the exact Postman flow for:
+
+1. Admin registration.
+2. Check received email.
+3. OTP verification.
+4. Incorrect OTP.
+5. Expired OTP.
+
+Do not invent endpoints.
+
+Do not change existing endpoints unless the actual implementation requires it.
+
+### Final report
+
+Report:
+
+1. Files created.
+2. Files modified.
+3. Gmail SMTP configuration.
+4. Required environment variables.
+5. Email OTP flow.
+6. OTP expiry behavior.
+7. OTP verification behavior.
+8. Automated test results.
+9. Build result.
+10. Actual Postman endpoints.
+11. Confirmation that Spring Security/JWT/login/refresh/logout were NOT modified.
+12. Confirmation that vehicle and driver code was NOT modified.
+13. Confirmation that OwnerandDriver project was NOT modified during this task.
+
+Do not make additional changes after the report.
+
+STOP.
