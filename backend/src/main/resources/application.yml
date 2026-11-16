@@ -3,17 +3,6 @@ spring:
   application:
     name: ai-chatbot-backend
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/AI_Chatbot_DB
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-
   ai:
     google:
       genai:
@@ -21,19 +10,6 @@ spring:
         chat:
           options:
             model: gemini-3.6-flash
-
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
 
 server:
   address: 0.0.0.0
