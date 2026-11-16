@@ -1,0 +1,92 @@
+<section class="projects-container">
+  
+  <div class="projects-header">
+    <div class="header-badge">Featured Portfolio</div>
+    <h2 class="projects-title">Key Engineering Projects</h2>
+    <p class="projects-subtitle">
+      Explore Prathmesh's production and showcase applications featuring full-stack Java/Spring Boot, Angular, React, RAG with PGVector, and workflow automation.
+    </p>
+  </div>
+
+  <div class="projects-grid">
+    <div
+      class="project-card"
+      *ngFor="let project of projects"
+      (click)="onViewDetails(project)"
+      tabindex="0"
+      (keyup.enter)="onViewDetails(project)">
+      
+      <!-- Card Category Badge -->
+      <div class="card-top">
+        <span class="category-pill">{{ project.category }}</span>
+      </div>
+
+      <!-- Project Name -->
+      <h3 class="card-title">{{ project.name }}</h3>
+
+      <!-- Description Area (Image when cardImage is set, Text otherwise) -->
+      <div class="card-image-wrapper" *ngIf="project.cardImage; else descTpl">
+        <img
+          [src]="project.cardImage"
+          [alt]="project.name"
+          class="card-preview-img"
+          loading="lazy"
+        />
+      </div>
+      <ng-template #descTpl>
+        <p class="card-desc">{{ project.shortDescription }}</p>
+      </ng-template>
+
+      <!-- Technology Stack Badges -->
+      <div class="card-tech-wrapper">
+        <div class="tech-label">Technologies:</div>
+        <div class="tech-pills">
+          <span class="tech-pill" *ngFor="let tech of project.technologies.slice(0, 5)">
+            {{ tech }}
+          </span>
+          <span class="tech-pill more" *ngIf="project.technologies.length > 5">
+            +{{ project.technologies.length - 5 }} more
+          </span>
+        </div>
+      </div>
+
+      <!-- Card Action Buttons -->
+      <div class="card-footer">
+        <button
+          type="button"
+          class="btn-view-details"
+          (click)="onViewDetails(project)">
+          <span>View Details</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <button
+          *ngIf="project.n8nWorkflowImage"
+          type="button"
+          class="btn-workflow-card"
+          (click)="onOpenWorkflow(project.n8nWorkflowImage, $event)"
+          title="View n8n Workflow Screenshot">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span>View n8n Workflow</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-ask-card"
+          (click)="onAskAi(project.askPrompt, $event)"
+          title="Ask AI Assistant about this project">
+          <span>Ask AI</span>
+          <span class="sparkle">✦</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</section>

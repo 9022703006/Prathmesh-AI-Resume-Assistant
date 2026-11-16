@@ -1,0 +1,242 @@
+<div class="modal-backdrop" *ngIf="isOpen && project" (click)="onClose()" tabindex="-1">
+  <div class="modal-container" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-labelledby]="'project-title-' + project.id">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <span class="category-badge">{{ project.category }}</span>
+        <h2 [id]="'project-title-' + project.id" class="project-title">{{ project.name }}</h2>
+        <h3 *ngIf="project.subtitle" class="project-subtitle">{{ project.subtitle }}</h3>
+      </div>
+
+      <button type="button" class="btn-close" (click)="onClose()" title="Close details" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content Scrollable -->
+    <div class="modal-body">
+
+      <!-- Workflow Collection Section (for AI Workflow Automation Hub) -->
+      <section class="section workflow-collection-section" id="workflow-collection" *ngIf="project.workflows && project.workflows.length > 0">
+        <div class="collection-header">
+          <div class="collection-badge">Automated Systems Showcase</div>
+          <h3 class="section-title">
+            <span class="section-icon">⚡</span>
+            WORKFLOW COLLECTION
+          </h3>
+          <p class="section-subtext">
+            Explore live production n8n workflows orchestrating LLMs, Google Sheets, Spring Boot APIs, and generative video media.
+          </p>
+        </div>
+
+        <div class="workflow-cards-grid">
+          <div
+            class="hub-wf-card"
+            *ngFor="let wf of project.workflows"
+            (click)="onSelectWorkflow(wf)"
+            tabindex="0"
+            (keyup.enter)="onSelectWorkflow(wf)">
+            
+            <div class="hub-wf-top">
+              <span class="hub-wf-icon">{{ wf.icon }}</span>
+              <span class="hub-wf-badge" *ngIf="wf.badge">{{ wf.badge }}</span>
+            </div>
+
+            <h4 class="hub-wf-title">{{ wf.title }}</h4>
+
+            <div class="hub-wf-tech">
+              <span class="hub-wf-tech-tag">{{ wf.shortTech }}</span>
+            </div>
+
+            <p class="hub-wf-desc">{{ wf.description }}</p>
+
+            <button
+              type="button"
+              class="btn-view-wf"
+              (click)="onSelectWorkflow(wf); $event.stopPropagation()">
+              <span>View Workflow</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Technologies Used -->
+      <section class="section">
+        <h3 class="section-title">
+          <span class="section-icon">⚙️</span>
+          Technology Stack
+        </h3>
+        <div class="tech-tags">
+          <span class="tech-tag" *ngFor="let tech of project.technologies">{{ tech }}</span>
+        </div>
+      </section>
+
+      <!-- Complete Project Description -->
+      <section class="section">
+        <h3 class="section-title">
+          <span class="section-icon">📄</span>
+          Project Overview
+        </h3>
+        <p class="section-text">{{ project.description }}</p>
+      </section>
+
+      <!-- Problem Solved -->
+      <section class="section">
+        <h3 class="section-title">
+          <span class="section-icon">🎯</span>
+          The Problem It Solves
+        </h3>
+        <p class="section-text callout">{{ project.problemSolved }}</p>
+      </section>
+
+      <!-- Architecture or Workflow -->
+      <section class="section" *ngIf="project.architecture">
+        <h3 class="section-title">
+          <span class="section-icon">🏗️</span>
+          Architecture & System Workflow
+        </h3>
+        <div class="architecture-box">
+          <code>{{ project.architecture }}</code>
+        </div>
+        <div *ngIf="project.emailWorkflow" class="workflow-sub-block">
+          <h4 class="workflow-sub-title">Email Workflow</h4>
+          <div class="architecture-box">
+            <code>{{ project.emailWorkflow }}</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- n8n Workflow Automation Section -->
+      <section class="section" *ngIf="project.n8nWorkflowImage">
+        <h3 class="section-title">
+          <span class="section-icon">🔄</span>
+          n8n Workflow Automation
+        </h3>
+        <p class="section-text" *ngIf="project.n8nWorkflowDescription">
+          {{ project.n8nWorkflowDescription }}
+        </p>
+        <div class="n8n-workflow-action">
+          <button
+            type="button"
+            class="btn-view-workflow-modal"
+            (click)="onOpenWorkflow(project.n8nWorkflowImage)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>View n8n Workflow</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Main Features -->
+      <section class="section">
+        <h3 class="section-title">
+          <span class="section-icon">✨</span>
+          Main Features & Capabilities
+        </h3>
+        <ul class="features-list">
+          <li *ngFor="let feat of project.features">
+            <span class="bullet-check">✓</span>
+            <span>{{ feat }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Highlights & Achievements -->
+      <section class="section" *ngIf="project.highlights && project.highlights.length > 0">
+        <h3 class="section-title">
+          <span class="section-icon">🏆</span>
+          Key Technical Highlights
+        </h3>
+        <ul class="highlights-list">
+          <li *ngFor="let item of project.highlights">
+            <span class="highlight-star">★</span>
+            <span>{{ item }}</span>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <!-- Modal Footer with Action Buttons -->
+    <div class="modal-footer">
+      <div class="action-buttons">
+        <!-- Live Demo / View Project Button only when URL available -->
+        <a
+          *ngIf="project.liveUrl"
+          [href]="project.liveUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-action btn-demo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          {{ project.liveUrlLabel || 'View Project' }}
+        </a>
+
+        <!-- GitHub Repository Button only when URL available -->
+        <a
+          *ngIf="project.githubUrl"
+          [href]="project.githubUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-action btn-github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          {{ project.githubUrlLabel || 'GitHub Repository' }}
+        </a>
+
+        <!-- View All Workflows Button (shown when project has workflows) -->
+        <button
+          *ngIf="project.workflows && project.workflows.length > 0"
+          type="button"
+          class="btn-action btn-view-all-wf"
+          (click)="scrollToWorkflows()"
+          title="Scroll to Workflow Collection">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          View All Workflows
+        </button>
+
+        <!-- View n8n Workflow Button (ONLY for AI-Powered Order Management, i.e. project.n8nWorkflowImage) -->
+        <button
+          *ngIf="project.n8nWorkflowImage"
+          type="button"
+          class="btn-action btn-workflow-footer"
+          (click)="onOpenWorkflow(project.n8nWorkflowImage)"
+          title="View n8n Workflow Screenshot">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          View n8n Workflow
+        </button>
+
+        <!-- Ask AI Button -->
+        <button type="button" class="btn-action btn-ask-ai" (click)="onAskAi()">
+          <span class="ai-spark">✦</span>
+          Ask AI About Project
+        </button>
+      </div>
+
+      <button type="button" class="btn-footer-close" (click)="onClose()">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>

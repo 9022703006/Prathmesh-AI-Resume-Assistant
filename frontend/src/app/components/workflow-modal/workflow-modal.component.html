@@ -1,0 +1,149 @@
+<div
+  class="wf-modal-backdrop"
+  *ngIf="isOpen && workflow"
+  (click)="onClose()"
+  tabindex="-1">
+  <div
+    class="wf-modal-dialog"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="workflow.title + ' — n8n Workflow'">
+    
+    <!-- Modal Header -->
+    <div class="wf-modal-header">
+      <div class="wf-header-left">
+        <span class="wf-badge-tag">n8n Workflow Automation</span>
+        <h2 class="wf-title">
+          <span class="wf-icon">{{ workflow.icon }}</span>
+          {{ workflow.title }} — n8n Workflow
+        </h2>
+      </div>
+
+      <button
+        type="button"
+        class="wf-btn-close"
+        (click)="onClose()"
+        title="Close workflow details"
+        aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="wf-modal-body">
+      
+      <!-- Description Section -->
+      <section class="wf-section">
+        <h4 class="wf-section-label">
+          <span class="wf-section-icon">📄</span>
+          Description
+        </h4>
+        <p class="wf-desc-text">{{ workflow.description }}</p>
+      </section>
+
+      <!-- Actual n8n Workflow Screenshot Section -->
+      <section class="wf-section wf-screenshot-section">
+        <div class="wf-screenshot-header">
+          <div class="wf-screenshot-title">
+            <span class="pulse-indicator"></span>
+            <strong>ACTUAL n8n SCREENSHOT</strong>
+          </div>
+          <span class="wf-zoom-hint">Click image to inspect in full size</span>
+        </div>
+
+        <div
+          class="wf-screenshot-frame"
+          (click)="onZoom(workflow.screenshot)"
+          title="Click to view high-resolution screenshot">
+          <img
+            [src]="workflow.screenshot"
+            [alt]="workflow.title + ' Actual n8n Workflow Diagram'"
+            class="wf-screenshot-img"
+            loading="lazy"
+          />
+          <div class="wf-screenshot-zoom-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            <span>Click to Expand</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Technologies -->
+      <section class="wf-section">
+        <h4 class="wf-section-label">
+          <span class="wf-section-icon">⚙️</span>
+          Technologies
+        </h4>
+        <div class="wf-tech-tags">
+          <span class="wf-tech-pill" *ngFor="let tech of workflow.technologies">
+            {{ tech }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Workflow Pipeline Steps -->
+      <section class="wf-section" *ngIf="workflow.keySteps && workflow.keySteps.length > 0">
+        <h4 class="wf-section-label">
+          <span class="wf-section-icon">🔄</span>
+          Workflow Execution Pipeline
+        </h4>
+        <ol class="wf-steps-list">
+          <li *ngFor="let step of workflow.keySteps; let i = index">
+            <span class="step-badge">{{ i + 1 }}</span>
+            <span class="step-text">{{ step }}</span>
+          </li>
+        </ol>
+      </section>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="wf-modal-footer">
+      <div class="wf-footer-actions">
+        <!-- Open Workflow (Opens Google Drive source in new tab) -->
+        <a
+          [href]="workflow.externalUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-open-workflow"
+          title="Open workflow in new tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Open Workflow</span>
+        </a>
+
+        <!-- Expand / Zoom Button -->
+        <button
+          type="button"
+          class="btn-zoom-wf"
+          (click)="onZoom(workflow.screenshot)"
+          title="Open full size image lightbox">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          <span>Full View</span>
+        </button>
+      </div>
+
+      <button type="button" class="btn-wf-close-secondary" (click)="onClose()">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>

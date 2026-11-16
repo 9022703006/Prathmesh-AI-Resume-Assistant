@@ -1,0 +1,466 @@
+<div class="chat-page">
+
+  <div class="assistant-card">
+
+    <!-- Top Navigation & Branding Header -->
+    <header class="assistant-header">
+
+      <div class="header-branding">
+        <div class="avatar-badge" title="Prathmesh Patil">
+          <span class="avatar-initials">PP</span>
+          <span class="online-indicator" title="Online and ready to assist"></span>
+        </div>
+
+        <div class="branding-text">
+          <h1 class="assistant-title">Prathmesh – AI Resume Assistant</h1>
+          <p class="assistant-status">
+            <span class="status-dot"></span>
+            Online • Java Full Stack & AI Specialist
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="header-nav">
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'chat'"
+          (click)="setTab('chat')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>AI Chat</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-tab"
+          [class.active]="activeTab === 'projects'"
+          (click)="setTab('projects')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span>Projects</span>
+          <span class="badge-count">{{ projectsCount }}</span>
+        </button>
+      </nav>
+
+      <!-- Action Buttons & External Profile Links -->
+      <div class="header-actions">
+        <!-- View Resume Button -->
+        <button
+          type="button"
+          class="action-btn btn-resume"
+          (click)="openResumeModal()"
+          title="Open Prathmesh's Resume PDF">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>View Resume</span>
+        </button>
+
+        <!-- Clear Chat Button -->
+        <button
+          *ngIf="activeTab === 'chat'"
+          type="button"
+          class="action-btn btn-clear"
+          (click)="clearChat()"
+          title="Clear Conversation">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Clear</span>
+        </button>
+
+        <!-- Social Profile Quick Links -->
+        <div class="social-links">
+          <a
+            [href]="links.github"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-btn"
+            title="GitHub Profile (9022703006)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+
+          <a
+            [href]="links.linkedin"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-btn"
+            title="LinkedIn Profile">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </a>
+
+          <a
+            [href]="links.portfolio"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="social-btn"
+            title="Live Portfolio Website">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- Main Content Area: AI Chat Tab -->
+    <main class="chat-tab-view" *ngIf="activeTab === 'chat'">
+
+      <!-- Messages Scroll Area -->
+      <div class="chat-messages" #messagesContainer>
+
+        <!-- Welcome Screen (Shown when messages array is empty) -->
+        <div class="welcome-screen" *ngIf="messages.length === 0 && !loading">
+
+          <div class="welcome-hero-card">
+            <div class="welcome-avatar">
+              <span class="welcome-initials">PP</span>
+              <span class="welcome-sparkle">✦</span>
+            </div>
+
+            <h2 class="welcome-heading">Hello! 👋 Welcome to Prathmesh's AI Resume Assistant.</h2>
+
+            <!-- Quick Access Two-Column Cards: Projects & GitHub -->
+            <div class="welcome-columns-grid">
+
+              <!-- Column 1: Projects Page -->
+              <button
+                type="button"
+                class="welcome-column-card project-column"
+                (click)="setTab('projects')"
+                title="Open Projects Page">
+                <div class="column-card-icon project-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                </div>
+                <div class="column-card-info">
+                  <div class="column-card-header">
+                    <h3 class="column-card-title">Projects</h3>
+                    <span class="column-card-badge project-badge">{{ projectsCount }} Featured</span>
+                  </div>
+                  <p class="column-card-desc">Explore featured projects, architecture & live demos</p>
+                </div>
+                <div class="column-card-action">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Column 2: GitHub Repositories -->
+              <a
+                [href]="links.githubRepositories"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="welcome-column-card github-column"
+                title="Open GitHub Repositories">
+                <div class="column-card-icon github-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                </div>
+                <div class="column-card-info">
+                  <div class="column-card-header">
+                    <h3 class="column-card-title">GitHub</h3>
+                    <span class="column-card-badge github-badge">Repositories</span>
+                  </div>
+                  <p class="column-card-desc">Browse source code, commits & repositories</p>
+                </div>
+                <div class="column-card-action">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </div>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- Clickable Suggested Questions -->
+          <div class="suggestions-container">
+            <div class="suggestions-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Suggested Recruiter Questions</span>
+            </div>
+
+            <div class="suggestions-grid">
+              <button
+                type="button"
+                class="suggestion-card"
+                *ngFor="let question of suggestedQuestions; let idx = index"
+                (click)="sendSuggestedQuestion(question)">
+                <span class="suggestion-index">{{ idx + 1 }}</span>
+                <span class="suggestion-text">{{ question }}</span>
+                <span class="suggestion-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Chat Conversation Messages Flow -->
+        <div class="messages-flow" *ngIf="messages.length > 0">
+
+          <div
+            class="message-row"
+            *ngFor="let msg of messages"
+            [class.user-row]="msg.sender === 'user'"
+            [class.ai-row]="msg.sender === 'ai'">
+
+            <!-- User Message Template -->
+            <ng-container *ngIf="msg.sender === 'user'">
+              <div class="message-content user-content">
+                <div class="message-sender-meta">
+                  <span class="sender-name">You (Recruiter)</span>
+                  <span class="message-time">{{ msg.timestamp | date:'shortTime' }}</span>
+                </div>
+                <div class="message-bubble user-bubble">
+                  {{ msg.text }}
+                </div>
+              </div>
+              <div class="message-avatar user-avatar" title="You">
+                <span>You</span>
+              </div>
+            </ng-container>
+
+            <!-- AI Assistant Message Template -->
+            <ng-container *ngIf="msg.sender === 'ai'">
+              <div class="message-avatar ai-avatar" title="Prathmesh – AI Assistant">
+                <span>PP</span>
+              </div>
+
+              <div class="message-content ai-content">
+                <div class="message-sender-meta">
+                  <span class="sender-name">Prathmesh – AI Resume Assistant</span>
+                  <span class="message-time">{{ msg.timestamp | date:'shortTime' }}</span>
+                </div>
+
+                <div class="message-bubble ai-bubble" [innerHTML]="msg.formattedText"></div>
+
+                <!-- In-Chat Resume Card (Shown when resume is queried) -->
+                <div class="chat-resume-card" *ngIf="msg.showResumeCard">
+                  <div class="resume-card-left">
+                    <div class="pdf-icon-badge">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                    </div>
+                    <div class="resume-card-info">
+                      <h4 class="resume-card-title">Prathmesh Sanjay Patil – Resume</h4>
+                      <p class="resume-card-filename">PrathmeshResume.pdf • Verified ATS Format</p>
+                    </div>
+                  </div>
+
+                  <div class="resume-card-buttons">
+                    <button
+                      type="button"
+                      class="btn-resume-action btn-view"
+                      (click)="openResumeModal()">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span>View Resume</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-resume-action btn-download"
+                      (click)="downloadResume()">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      <span>Download Resume</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </ng-container>
+
+          </div>
+
+          <!-- Loading Indicator (Typing State) -->
+          <div class="message-row ai-row loading-row" *ngIf="loading">
+            <div class="message-avatar ai-avatar">
+              <span>PP</span>
+            </div>
+            <div class="message-content ai-content">
+              <div class="message-sender-meta">
+                <span class="sender-name">Prathmesh – AI Resume Assistant</span>
+              </div>
+              <div class="typing-bubble">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Quick Suggested Questions Pill Bar (Always accessible even during chat) -->
+      <div class="quick-pills-bar" *ngIf="messages.length > 0">
+        <span class="quick-pills-label">Quick Suggestions:</span>
+        <div class="quick-pills-scroll">
+          <button
+            type="button"
+            class="quick-pill"
+            *ngFor="let q of suggestedQuestions"
+            [disabled]="loading"
+            (click)="sendSuggestedQuestion(q)">
+            {{ q }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Input Footer -->
+      <footer class="chat-footer">
+        <div class="input-container">
+          <input
+            type="text"
+            class="chat-input"
+            [(ngModel)]="userMessage"
+            placeholder="Ask about Prathmesh's skills, experience, projects, or resume..."
+            autocomplete="off"
+            [disabled]="loading"
+            (keyup.enter)="sendMessage()"
+          />
+
+          <button
+            type="button"
+            class="btn-send"
+            (click)="sendMessage()"
+            [disabled]="loading || !userMessage.trim()"
+            title="Send Message"
+            aria-label="Send Message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+
+        <div class="input-hint">
+          <span>Press <strong>Enter ↵</strong> to send • AI responds using verified profile information</span>
+        </div>
+      </footer>
+
+    </main>
+
+    <!-- Main Content Area: Featured Projects Tab -->
+    <main class="projects-tab-view" *ngIf="activeTab === 'projects'">
+      <app-projects-section
+        (viewDetails)="openProjectModal($event)"
+        (askAboutProject)="onAskAboutProject($event)"
+        (openWorkflow)="openWorkflowViewer($event)">
+      </app-projects-section>
+    </main>
+
+  </div>
+
+</div>
+
+<!-- Resume Viewer Modal -->
+<app-resume-modal
+  [isOpen]="isResumeModalOpen"
+  (close)="closeResumeModal()">
+</app-resume-modal>
+
+<!-- Project Details Modal -->
+<app-project-modal
+  [isOpen]="isProjectModalOpen"
+  [project]="selectedProject"
+  (close)="closeProjectModal()"
+  (askAboutProject)="onAskAboutProject($event)"
+  (openWorkflow)="openWorkflowViewer($event)"
+  (viewWorkflowItem)="openWorkflowModal($event)">
+</app-project-modal>
+
+<!-- Individual Workflow Details Modal -->
+<app-workflow-modal
+  [isOpen]="isWorkflowModalOpen"
+  [workflow]="selectedWorkflow"
+  (close)="closeWorkflowModal()"
+  (zoomImage)="openWorkflowViewer($event, (selectedWorkflow?.title || 'Workflow') + ' — n8n Architecture')">
+</app-workflow-modal>
+
+<!-- n8n Workflow Lightbox / Image Viewer Modal -->
+<div
+  class="workflow-viewer-backdrop"
+  *ngIf="isWorkflowViewerOpen"
+  (click)="closeWorkflowViewer()"
+  tabindex="-1">
+  <div class="workflow-viewer-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="n8n Workflow Screenshot Viewer">
+    <div class="workflow-viewer-header">
+      <div class="workflow-viewer-title-row">
+        <span class="workflow-viewer-badge">Workflow Automation</span>
+        <h3 class="workflow-viewer-title">{{ workflowTitle }}</h3>
+      </div>
+      <div class="workflow-viewer-actions">
+        <a
+          [href]="workflowImageUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-viewer-open-external"
+          title="Open original image in new tab">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Open Full Size</span>
+        </a>
+        <button
+          type="button"
+          class="btn-viewer-close"
+          (click)="closeWorkflowViewer()"
+          title="Close workflow viewer"
+          aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="workflow-viewer-body">
+      <img
+        [src]="workflowImageUrl"
+        [alt]="workflowTitle"
+        class="workflow-image"
+      />
+    </div>
+  </div>
+</div>
