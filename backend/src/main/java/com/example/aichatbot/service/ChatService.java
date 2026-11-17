@@ -5,16 +5,40 @@ import com.example.aichatbot.Enum.TripType;
 import com.example.aichatbot.RAG.RagService;
 import com.example.aichatbot.entity.Booking;
 import com.example.aichatbot.entity.Vehicle;
+import com.google.genai.errors.ApiException;
+import com.google.genai.errors.ClientException;
+import com.google.genai.errors.GenAiIOException;
+import com.google.genai.errors.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.retry.NonTransientAiException;
+import org.springframework.ai.retry.TransientAiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 public class ChatService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+
+    private static final int MAX_RETRIES = 3;
+    private static final long INITIAL_DELAY_MS = 1000L;
+    private static final double BACKOFF_MULTIPLIER = 2.0;
+
+    private int maxRetries = MAX_RETRIES;
+    private long initialDelayMs = INITIAL_DELAY_MS;
+    private double backoffMultiplier = BACKOFF_MULTIPLIER;
 
     private final ChatClient chatClient;
     private final RagService ragService;
@@ -48,6 +72,17 @@ public class ChatService {
         this.ragService = ragService;
         this.vehicleService = vehicleService.orElse(null);
         this.bookingService = bookingService.orElse(null);
+    }
+
+    ChatService(
+            ChatClient chatClient,
+            RagService ragService,
+            VehicleService vehicleService,
+            BookingService bookingService) {
+        this.chatClient = chatClient;
+        this.ragService = ragService;
+        this.vehicleService = vehicleService;
+        this.bookingService = bookingService;
     }
 
     public String chat(String message) {
@@ -272,7 +307,7 @@ public class ChatService {
 
         if (!vehicleContext.isEmpty()) {
 
-            return chatClient.prompt()
+            return executePromptWithRetry(() -> chatClient.prompt()
                     .system("""
                             You are a car rental assistant.
 
@@ -283,7 +318,7 @@ public class ChatService {
                             """ + vehicleContext)
                     .user(userMessage)
                     .call()
-                    .content();
+                    .content());
         }
 
         // =========================
@@ -294,7 +329,7 @@ public class ChatService {
 
         if (!context.isEmpty()) {
 
-            return chatClient.prompt()
+            return executePromptWithRetry(() -> chatClient.prompt()
                     .system("""
                             You are a helpful car rental assistant.
 
@@ -304,17 +339,288 @@ public class ChatService {
                             """ + context)
                     .user(userMessage)
                     .call()
-                    .content();
+                    .content());
         }
 
         // =========================
         // FALLBACK
         // =========================
 
-        return chatClient.prompt()
+        return executePromptWithRetry(() -> chatClient.prompt()
                 .user(userMessage)
                 .call()
-                .content();
+                .content());
+    }
+
+    String executePromptWithRetry(Supplier<String> promptAction) {
+        int retryCount = 0;
+        long currentDelay = initialDelayMs;
+
+        while (true) {
+            try {
+                String response = promptAction.get();
+                return response != null ? response : "";
+            } catch (Throwable t) {
+                if (!isRetryable(t)) {
+                    logger.error("Gemini API call failed with non-retryable error: {}", t.getMessage(), t);
+                    return getClearErrorMessage(t);
+                }
+
+                if (retryCount >= maxRetries) {
+                    logger.error("Gemini API call failed after {} retries: {}", maxRetries, t.getMessage(), t);
+                    return getClearErrorMessage(t);
+                }
+
+                retryCount++;
+                logger.warn("Temporary Gemini API error (attempt {} of {}). Retrying in {} ms. Error: {}",
+                        retryCount, maxRetries, currentDelay, t.getMessage());
+
+                try {
+                    Thread.sleep(currentDelay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    logger.error("Gemini retry backoff interrupted: {}", ie.getMessage(), ie);
+                    return "The request was interrupted while waiting to retry. Please try again.";
+                }
+
+                currentDelay = (long) (currentDelay * backoffMultiplier);
+            }
+        }
+    }
+
+    private boolean isNonRetryable(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            // Google GenAI 4xx client errors (400, 401, 403, 404, etc.)
+            if (current instanceof ClientException) {
+                return true;
+            }
+
+            if (current instanceof ApiException apiEx) {
+                int code = apiEx.code();
+                if (code >= 400 && code < 500) {
+                    return true;
+                }
+            }
+
+            // Spring AI non-transient error
+            if (current instanceof NonTransientAiException) {
+                return true;
+            }
+
+            // Spring Web 4xx client error
+            if (current instanceof HttpStatusCodeException httpEx) {
+                int code = httpEx.getStatusCode().value();
+                if (code >= 400 && code < 500) {
+                    return true;
+                }
+            }
+
+            // Message-based checks for invalid API keys, authentication, or invalid model names
+            String msg = current.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("api key")
+                        || lower.contains("api_key")
+                        || lower.contains("unauthenticated")
+                        || lower.contains("permission_denied")
+                        || lower.contains("permission denied")
+                        || lower.contains("unauthorized")
+                        || lower.contains("forbidden")
+                        || lower.contains("invalid model")
+                        || lower.contains("model not found")
+                        || lower.contains("models/")
+                        || lower.contains("is not found")
+                        || lower.contains("not_found")
+                        || lower.contains("invalid_argument")
+                        || lower.contains("invalid argument")
+                        || lower.contains("401")
+                        || lower.contains("403")
+                        || lower.contains("404")) {
+                    return true;
+                }
+            }
+
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private boolean isRetryable(Throwable throwable) {
+        if (isNonRetryable(throwable)) {
+            return false;
+        }
+
+        Throwable current = throwable;
+        while (current != null) {
+            // Google GenAI 5xx server errors (500, 502, 503, 504, etc.)
+            if (current instanceof ServerException) {
+                return true;
+            }
+
+            if (current instanceof ApiException apiEx) {
+                int code = apiEx.code();
+                if (code == 503 || (code >= 500 && code < 600)) {
+                    return true;
+                }
+            }
+
+            // Spring AI transient errors
+            if (current instanceof TransientAiException) {
+                return true;
+            }
+
+            // Spring Web 5xx errors
+            if (current instanceof HttpStatusCodeException httpEx) {
+                int code = httpEx.getStatusCode().value();
+                if (code == 503 || (code >= 500 && code < 600)) {
+                    return true;
+                }
+            }
+
+            // Network / I/O transient errors
+            if (current instanceof SocketTimeoutException
+                    || current instanceof ConnectException
+                    || current instanceof ResourceAccessException
+                    || current instanceof GenAiIOException) {
+                return true;
+            }
+
+            // Message-based checks for temporary service errors (503 / 5xx)
+            String msg = current.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("503")
+                        || lower.contains("service unavailable")
+                        || lower.contains("unavailable")
+                        || lower.contains("502")
+                        || lower.contains("bad gateway")
+                        || lower.contains("504")
+                        || lower.contains("gateway timeout")
+                        || lower.contains("500")
+                        || lower.contains("internal server error")
+                        || lower.contains("resource_exhausted")
+                        || lower.contains("transient")) {
+                    return true;
+                }
+            }
+
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private String getClearErrorMessage(Throwable throwable) {
+        if (isAuthOrApiKeyError(throwable)) {
+            return "Unable to process request: Gemini API key or authentication error. Please verify your API key configuration.";
+        }
+        if (isModelNotFoundError(throwable)) {
+            return "Unable to process request: The configured Gemini model was not found or is invalid. Please verify model configuration.";
+        }
+        if (isClientError(throwable)) {
+            return "Unable to process request: Invalid request to Gemini API. Please check your query or configuration.";
+        }
+        if (isRetryable(throwable)) {
+            return "The AI service is temporarily unavailable due to high demand or service maintenance. Please try again in a few moments.";
+        }
+        return "The AI service encountered an error while processing your request. Please try again later.";
+    }
+
+    private boolean isAuthOrApiKeyError(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof ApiException apiEx) {
+                int code = apiEx.code();
+                if (code == 401 || code == 403) {
+                    return true;
+                }
+            }
+            String msg = current.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("api key")
+                        || lower.contains("api_key")
+                        || lower.contains("unauthenticated")
+                        || lower.contains("permission_denied")
+                        || lower.contains("permission denied")
+                        || lower.contains("unauthorized")
+                        || lower.contains("forbidden")
+                        || lower.contains("401")
+                        || lower.contains("403")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private boolean isModelNotFoundError(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof ApiException apiEx) {
+                int code = apiEx.code();
+                if (code == 404) {
+                    return true;
+                }
+            }
+            String msg = current.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("invalid model")
+                        || lower.contains("model not found")
+                        || lower.contains("models/")
+                        || lower.contains("404")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    private boolean isClientError(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof ClientException) {
+                return true;
+            }
+            if (current instanceof ApiException apiEx) {
+                int code = apiEx.code();
+                if (code >= 400 && code < 500) {
+                    return true;
+                }
+            }
+            if (current instanceof NonTransientAiException) {
+                return true;
+            }
+            if (current instanceof HttpStatusCodeException httpEx) {
+                int code = httpEx.getStatusCode().value();
+                if (code >= 400 && code < 500) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    void setRetryConfig(int maxRetries, long initialDelayMs, double backoffMultiplier) {
+        this.maxRetries = maxRetries;
+        this.initialDelayMs = initialDelayMs;
+        this.backoffMultiplier = backoffMultiplier;
+    }
+
+    boolean isRetryableError(Throwable t) {
+        return isRetryable(t);
+    }
+
+    boolean isNonRetryableError(Throwable t) {
+        return isNonRetryable(t);
+    }
+
+    String resolveClearErrorMessage(Throwable t) {
+        return getClearErrorMessage(t);
     }
 
     private String getVehicleContext(String message) {

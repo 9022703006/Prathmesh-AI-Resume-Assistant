@@ -9,7 +9,20 @@ spring:
         api-key: ${GEMINI_API_KEY}
         chat:
           options:
-            model: gemini-3.6-flash
+            model: gemini-3.8-flash
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 1000ms
+        multiplier: 2
+        max-interval: 10000ms
+      on-http-codes:
+        - 503
+      exclude-on-http-codes:
+        - 400
+        - 401
+        - 403
+        - 404
 
 server:
   address: 0.0.0.0
