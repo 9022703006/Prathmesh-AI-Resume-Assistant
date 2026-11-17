@@ -6,10 +6,12 @@ import com.example.aichatbot.RAG.RagService;
 import com.example.aichatbot.entity.Booking;
 import com.example.aichatbot.entity.Vehicle;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 public class ChatService {
@@ -23,14 +25,29 @@ public class ChatService {
 
     public ChatService(
             ChatClient.Builder chatClientBuilder,
+            RagService ragService) {
+        this(chatClientBuilder, ragService, Optional.empty(), Optional.empty());
+    }
+
+    public ChatService(
+            ChatClient.Builder chatClientBuilder,
             RagService ragService,
             VehicleService vehicleService,
             BookingService bookingService) {
+        this(chatClientBuilder, ragService, Optional.ofNullable(vehicleService), Optional.ofNullable(bookingService));
+    }
+
+    @Autowired
+    public ChatService(
+            ChatClient.Builder chatClientBuilder,
+            RagService ragService,
+            Optional<VehicleService> vehicleService,
+            Optional<BookingService> bookingService) {
 
         this.chatClient = chatClientBuilder.build();
         this.ragService = ragService;
-        this.vehicleService = vehicleService;
-        this.bookingService = bookingService;
+        this.vehicleService = vehicleService.orElse(null);
+        this.bookingService = bookingService.orElse(null);
     }
 
     public String chat(String message) {
@@ -38,7 +55,8 @@ public class ChatService {
         String userMessage = message.trim();
 
         // Start booking
-        if (userMessage.toLowerCase().contains("book")
+        if (bookingService != null && vehicleService != null
+                && userMessage.toLowerCase().contains("book")
                 && currentBooking == null) {
 
             currentBooking = new Booking();
@@ -49,7 +67,7 @@ public class ChatService {
         // =========================
         // BOOKING FLOW
         // =========================
-        if (currentBooking != null) {
+        if (currentBooking != null && bookingService != null && vehicleService != null) {
 
             // 1. Vehicle
             if (currentBooking.getVehicle() == null) {
@@ -300,6 +318,10 @@ public class ChatService {
     }
 
     private String getVehicleContext(String message) {
+
+        if (vehicleService == null) {
+            return "";
+        }
 
         String lowerMessage = message.toLowerCase();
 

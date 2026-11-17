@@ -3,6 +3,7 @@ package com.example.aichatbot.controller;
 import com.example.aichatbot.Enum.VehicleType;
 import com.example.aichatbot.entity.Vehicle;
 import com.example.aichatbot.service.VehicleService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/vehicles")
 @CrossOrigin(origins = "http://localhost:4200")
+@Profile("!gemini-only")
 public class VehicleController {
 
     private final VehicleService vehicleService;

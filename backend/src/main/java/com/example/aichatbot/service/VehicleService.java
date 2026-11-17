@@ -3,12 +3,14 @@ package com.example.aichatbot.service;
 import com.example.aichatbot.Enum.VehicleType;
 import com.example.aichatbot.entity.Vehicle;
 import com.example.aichatbot.repository.VehicleRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Profile("!gemini-only")
 public class VehicleService {
     private final VehicleRepository vehicleRepository;
 

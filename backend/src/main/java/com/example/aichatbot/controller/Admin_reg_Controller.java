@@ -2,11 +2,13 @@ package com.example.aichatbot.controller;
 
 import com.example.aichatbot.entity.Admin_register;
 import com.example.aichatbot.service.Admin_Reg_service;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin")
+@Profile("!gemini-only")
 public class Admin_reg_Controller {
 
     private final Admin_Reg_service adminRegService;

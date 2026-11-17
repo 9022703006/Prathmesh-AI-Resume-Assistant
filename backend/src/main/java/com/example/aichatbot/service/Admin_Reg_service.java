@@ -4,12 +4,14 @@ import com.example.aichatbot.entity.Admin_register;
 import com.example.aichatbot.repository.Admin_reg_Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 @Service
+@Profile("!gemini-only")
 public class Admin_Reg_service {
 
     private static final Logger logger = LoggerFactory.getLogger(Admin_Reg_service.class);
