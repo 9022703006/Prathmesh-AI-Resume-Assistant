@@ -361,6 +361,11 @@ public class ChatService {
                 String response = promptAction.get();
                 return response != null ? response : "";
             } catch (Throwable t) {
+                if (isQuotaExceededError(t)) {
+                    logger.error("Gemini API quota exceeded (HTTP 429): {}", t.getMessage(), t);
+                    return getClearErrorMessage(t);
+                }
+
                 if (!isRetryable(t)) {
                     logger.error("Gemini API call failed with non-retryable error: {}", t.getMessage(), t);
                     return getClearErrorMessage(t);
@@ -388,7 +393,48 @@ public class ChatService {
         }
     }
 
+    private boolean isQuotaExceededError(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof ApiException apiEx) {
+                if (apiEx.code() == 429 || "RESOURCE_EXHAUSTED".equalsIgnoreCase(apiEx.status())) {
+                    return true;
+                }
+            }
+
+            if (current instanceof HttpStatusCodeException httpEx) {
+                if (httpEx.getStatusCode().value() == 429) {
+                    return true;
+                }
+            }
+
+            String msg = current.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("429")
+                        || lower.contains("quota exceeded")
+                        || lower.contains("quota_exceeded")
+                        || lower.contains("quota")
+                        || lower.contains("rate limit")
+                        || lower.contains("rate_limit")
+                        || lower.contains("ratelimit")
+                        || lower.contains("resource_exhausted")
+                        || lower.contains("resource exhausted")
+                        || lower.contains("too many requests")) {
+                    return true;
+                }
+            }
+
+            current = current.getCause();
+        }
+        return false;
+    }
+
     private boolean isNonRetryable(Throwable throwable) {
+        if (isQuotaExceededError(throwable)) {
+            return true;
+        }
+
         Throwable current = throwable;
         while (current != null) {
             // Google GenAI 4xx client errors (400, 401, 403, 404, etc.)
@@ -447,6 +493,10 @@ public class ChatService {
     }
 
     private boolean isRetryable(Throwable throwable) {
+        if (isQuotaExceededError(throwable)) {
+            return false;
+        }
+
         if (isNonRetryable(throwable)) {
             return false;
         }
@@ -499,7 +549,6 @@ public class ChatService {
                         || lower.contains("gateway timeout")
                         || lower.contains("500")
                         || lower.contains("internal server error")
-                        || lower.contains("resource_exhausted")
                         || lower.contains("transient")) {
                     return true;
                 }
@@ -511,6 +560,9 @@ public class ChatService {
     }
 
     private String getClearErrorMessage(Throwable throwable) {
+        if (isQuotaExceededError(throwable)) {
+            return "Gemini API quota exceeded. Please try again later after the quota resets.";
+        }
         if (isAuthOrApiKeyError(throwable)) {
             return "Unable to process request: Gemini API key or authentication error. Please verify your API key configuration.";
         }
@@ -617,6 +669,10 @@ public class ChatService {
 
     boolean isNonRetryableError(Throwable t) {
         return isNonRetryable(t);
+    }
+
+    boolean isQuotaError(Throwable t) {
+        return isQuotaExceededError(t);
     }
 
     String resolveClearErrorMessage(Throwable t) {
