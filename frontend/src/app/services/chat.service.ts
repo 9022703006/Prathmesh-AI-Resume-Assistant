@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ChatService {
 
-  private apiUrl = 'http://localhost:7000/api/chat';// 
+  private apiUrl = 'https://prathmesh-resume-backend.hostless.app/api/chat';
 
   constructor(private http: HttpClient) {}
 
