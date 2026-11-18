@@ -9,7 +9,7 @@ spring:
         api-key: ${GEMINI_API_KEY}
         chat:
           options:
-            model: gemini-3.8-flash
+            model: ${GEMINI_MODEL:gemini-3.8-flash}
     retry:
       max-attempts: 3
       backoff:
